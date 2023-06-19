@@ -1,6 +1,7 @@
 package com.reservation.controller
 
 import com.reservation.assembler.ReservationAssembler
+import com.reservation.exception.ReservationException
 import com.reservation.request.ReservationRequestDTO
 import com.reservation.response.ReservationResponseDTO
 import com.reservation.service.ReservationService
@@ -22,26 +23,29 @@ class ReservationController(
     @PostMapping("/reserve")
     fun reserve(@RequestBody dto: ReservationRequestDTO): ResponseEntity<ReservationResponseDTO> {
         logger.info("reserve: $dto")
-        val restaurant = restaurantService.getRestaurantByName(dto.restaurant)
-        val reservation = reservationService.createReservation(dto, restaurant.numberOfTable)
-        restaurantService.decreaseTable(restaurant, reservation.numberOfTable)
-        return ResponseEntity.ok(reservationAssembler.assembleDTO(reservation))
+        val restaurant = restaurantService.getRestaurantByKey(dto.restaurantName, dto.date)
+        val reservation = reservationService.createReservation(dto, restaurant.numberOfTable, restaurant)
+        val updatedRestaurant = restaurantService.decreaseTable(restaurant, reservation.numberOfTable)
+        return ResponseEntity.ok(reservationAssembler.assembleDTO(reservation, updatedRestaurant.numberOfTable))
     }
 
-    @GetMapping("/{restaurantName}")
-    fun getReservations(@PathVariable restaurantName: String): ResponseEntity<List<ReservationResponseDTO>> {
-        logger.info("getReservation: Restaurant: $restaurantName")
-        val reservations = reservationService.getReservationByRestaurant(restaurantName)
-        return ResponseEntity.ok(reservations.map { reservationAssembler.assembleDTO(it) })
-    }
-
-    @DeleteMapping("/cancel/{restaurantName}/{id}")
-    fun cancel(@PathVariable restaurantName: String, @PathVariable id: String): ResponseEntity<ReservationResponseDTO> {
-        logger.info("cancel: restaurant: $restaurantName, id: $id")
-        val restaurant = restaurantService.getRestaurantByName(restaurantName)
+    @DeleteMapping("/cancel/{restaurantName}/{date}/{id}")
+    fun cancel(
+        @PathVariable restaurantName: String,
+        @PathVariable date: String,
+        @PathVariable id: String
+    ): ResponseEntity<ReservationResponseDTO> {
+        logger.info("cancel: restaurant: $restaurantName, date: $date, id: $id")
         val reservation = reservationService.getReservationById(id)
-        restaurantService.increaseTable(restaurant, reservation.numberOfTable)
+        if (restaurantName != reservation.restaurantName) throw ReservationException("Booking $id is not belong to $restaurantName")
+        val restaurant = restaurantService.getRestaurantByKey(reservation.restaurantName, date)
         val cancelledReservation = reservationService.cancelReservation(reservation)
-        return ResponseEntity.ok(reservationAssembler.assembleDTO(cancelledReservation))
+        val updatedRestaurant = restaurantService.increaseTable(restaurant, reservation.numberOfTable)
+        return ResponseEntity.ok(
+            reservationAssembler.assembleDTO(
+                cancelledReservation,
+                updatedRestaurant.numberOfTable
+            )
+        )
     }
 }

@@ -36,13 +36,13 @@ class ExceptionControllerAdvice {
             HttpStatus.NOT_FOUND.value(),
             ex.message
         )
-        return ResponseEntity(errorMessage, HttpStatus.BAD_REQUEST)
+        return ResponseEntity(errorMessage, HttpStatus.NOT_FOUND)
     }
 
     @ExceptionHandler
     fun handleReservationException(ex: ReservationException): ResponseEntity<ErrorDTO> {
         val errorMessage = ErrorDTO(
-            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            HttpStatus.BAD_REQUEST.value(),
             ex.message
         )
         return ResponseEntity(errorMessage, HttpStatus.BAD_REQUEST)

@@ -1,13 +1,13 @@
 package com.reservation.service
 
 import com.reservation.domain.Restaurant
-import com.reservation.request.RestaurantRequestDTO
+import com.reservation.domain.RestaurantKey
 import com.reservation.exception.BadRequestException
 import com.reservation.exception.NotFoundException
 import com.reservation.exception.ReservationException
 import com.reservation.repository.RestaurantRepository
+import com.reservation.request.RestaurantRequestDTO
 import org.slf4j.LoggerFactory
-import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -22,23 +22,21 @@ class RestaurantService(
     private val logger = LoggerFactory.getLogger(RestaurantService::class.java)
 
     @Transactional
-    @Cacheable(cacheNames = ["restaurant"], key = "#name")
-    fun getRestaurantByName(name: String?): Restaurant {
+    @Cacheable(cacheNames = ["restaurant"], key = "{#name, #date}")
+    fun getRestaurantByKey(name: String?, date: String?): Restaurant {
         logger.debug("getRestaurantByName: $name")
-        return restaurantRepository.findByIdOrNull(name) ?: throw NotFoundException("Restaurant $name not found.")
-    }
-
-    @Transactional
-    fun getRestaurants(): List<Restaurant> {
-        logger.debug("getRestaurants")
-        return restaurantRepository.findAll()
+        val restaurantKey = RestaurantKey()
+        restaurantKey.restaurantName = name
+        restaurantKey.date = date
+        return restaurantRepository.findByIdOrNull(restaurantKey)
+            ?: throw NotFoundException("Restaurant $name not found.")
     }
 
     @Transactional
     fun decreaseTable(restaurant: Restaurant, table: Int?): Restaurant {
         logger.debug("decreaseTable: restaurant: $restaurant, table: $table")
-        val result = restaurant.numberOfTable - (table ?: 0)
-        if (result > 0) {
+        val result = restaurant.numberOfTable?.let { it - (table ?: 0) }
+        if ((result ?: 0) > 0) {
             restaurant.numberOfTable = result
             return restaurantRepository.save(restaurant)
         } else {
@@ -49,7 +47,7 @@ class RestaurantService(
     @Transactional
     fun increaseTable(restaurant: Restaurant, table: Int?): Restaurant {
         logger.debug("increaseTable: restaurant: $restaurant, table: $table")
-        restaurant.numberOfTable = restaurant.numberOfTable + (table ?: 0)
+        restaurant.numberOfTable = restaurant.numberOfTable?.let { it + (table ?: 0) }
         return restaurantRepository.save(restaurant)
 
     }
@@ -58,24 +56,25 @@ class RestaurantService(
     fun createRestaurant(dto: RestaurantRequestDTO): Restaurant {
         logger.debug("createRestaurant: $dto")
         val restaurant = Restaurant()
-        restaurant.name = dto.name
+        val key = RestaurantKey()
+        key.restaurantName = dto.restaurantName
+        key.date = dto.date
+        restaurant.key = key
         restaurant.initialized = dto.initialized
         restaurant.numberOfTable = dto.numberOfTable
         return restaurantRepository.save(restaurant)
     }
 
     @Transactional
-    @CacheEvict(cacheNames = ["restaurant"], key = "#dto.name")
     fun initialize(dto: RestaurantRequestDTO): Restaurant {
         logger.debug("initialize: dto: $dto")
-        val restaurant = dto.name?.let { restaurantRepository.findByIdOrNull(it) }
+        val restaurantKey = RestaurantKey()
+        restaurantKey.restaurantName = dto.restaurantName
+        restaurantKey.date = dto.date
+        val restaurant = restaurantRepository.findByIdOrNull(restaurantKey)
+
         return restaurant?.let {
-            if (!it.initialized) {
-                it.initialized = dto.initialized
-                restaurantRepository.save(it)
-            } else {
-                throw BadRequestException("Error: The table of restaurant ${restaurant.name} has been initialized already.")
-            }
+            throw BadRequestException("Error: The table of restaurant ${restaurant.key} has been initialized already.")
         } ?: createRestaurant(dto)
     }
 }

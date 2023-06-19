@@ -25,17 +25,10 @@ class RestaurantController(
         return ResponseEntity.ok(restaurantAssembler.assembleDTO(updatedRestaurant))
     }
 
-    @GetMapping("/{name}")
-    fun getRestaurant(@PathVariable name: String): ResponseEntity<RestaurantResponseDTO> {
-        logger.info("getRestaurant: $name")
-        val restaurant = restaurantService.getRestaurantByName(name)
+    @GetMapping("/{name}/{date}")
+    fun getRestaurant(@PathVariable name: String, @PathVariable date: String): ResponseEntity<RestaurantResponseDTO> {
+        logger.info("getRestaurant: name: $name, date: $date")
+        val restaurant = restaurantService.getRestaurantByKey(name, date)
         return ResponseEntity.ok(restaurantAssembler.assembleDTO(restaurant))
-    }
-
-    @GetMapping("/")
-    fun getRestaurants(): ResponseEntity<List<RestaurantResponseDTO>> {
-        logger.info("getRestaurant")
-        val restaurants = restaurantService.getRestaurants()
-        return ResponseEntity.ok(restaurants.map { restaurantAssembler.assembleDTO(it) })
     }
 }

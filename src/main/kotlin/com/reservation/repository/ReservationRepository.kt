@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ReservationRepository : MongoRepository<Reservation, String> {
-    fun findAllByRestaurant(name: String): List<Reservation>
+    fun findAllByRestaurantNameAndDate(name: String, date: String): List<Reservation>
 }

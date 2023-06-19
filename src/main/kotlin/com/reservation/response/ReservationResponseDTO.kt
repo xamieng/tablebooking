@@ -1,15 +1,13 @@
 package com.reservation.response
 
-import javax.validation.constraints.NotNull
-
 class ReservationResponseDTO {
     var reservationId: String? = null
-    @NotNull
-    var restaurant: String? = null
-    @NotNull
-    var numberOfGuest: Int = 0
-    var numberOfTable: Int = 0
+    var restaurantName: String? = null
+    var date: String? = null
+    var numberOfGuest: Int? = 0
+    var numberOfTable: Int? = 0
     var active: Boolean = false
+    var remainingTable: Int? = 0
     override fun toString() =
-        "ReservationDTO = { reservationId: $reservationId, restaurant, $restaurant, numberOfGuest: $numberOfGuest, numberOfTable: $numberOfTable, active: $active }"
+        "ReservationResponseDTO = { reservationId: $reservationId, restaurantName: $restaurantName, date: $date, numberOfGuest: $numberOfGuest, numberOfTable: $numberOfTable, active: $active, remainingTable:$remainingTable }"
 }
