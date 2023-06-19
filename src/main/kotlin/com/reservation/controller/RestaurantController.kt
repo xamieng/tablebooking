@@ -18,7 +18,7 @@ class RestaurantController(
 
     private val logger = LoggerFactory.getLogger(RestaurantController::class.java)
 
-    @PostMapping("/initialize")
+    @PostMapping("/table/initialize")
     fun initialize(@Valid @RequestBody dto: RestaurantRequestDTO): ResponseEntity<RestaurantResponseDTO> {
         logger.info("Initializing tables: $dto")
         val updatedRestaurant = restaurantService.initialize(dto)
