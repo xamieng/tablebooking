@@ -1,0 +1,16 @@
+version: '3.1'
+
+services:
+  springboot:
+    build: .
+    restart: always
+    container_name: reservationapp
+    ports:
+      - 8080:8080
+    working_dir: /opt/app
+
+  mongodb:
+    image: "mongo:6.0.6"
+    restart: always
+    ports:
+      - 27017:27017
