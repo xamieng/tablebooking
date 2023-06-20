@@ -7,12 +7,17 @@
 
 ### 2. BUILD
 ```
-gradlew build
+./gradlew build
 ```
 
 ### 3. START API
 ```
 docker-compose -f docker-compose.yml up -d
+```
+
+### 3. STOP API
+```
+docker-compose -f docker-compose.yml down
 ```
 
 ### 5. API Specification
