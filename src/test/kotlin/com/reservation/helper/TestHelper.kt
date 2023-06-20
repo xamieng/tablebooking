@@ -29,7 +29,6 @@ object TestHelper {
         val dto = RestaurantRequestDTO()
         dto.restaurantName = "mock name"
         dto.date = "mock date"
-        dto.initialized = true
         dto.numberOfTable = 5
         return dto
     }
