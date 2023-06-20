@@ -36,11 +36,11 @@ class RestaurantService(
     fun decreaseTable(restaurant: Restaurant, table: Int?): Restaurant {
         logger.debug("decreaseTable: restaurant: $restaurant, table: $table")
         val result = restaurant.numberOfTable?.let { it - (table ?: 0) }
-        if ((result ?: 0) > 0) {
+        if ((result ?: -1) >= 0) {
             restaurant.numberOfTable = result
             return restaurantRepository.save(restaurant)
         } else {
-            throw ReservationException("Internal error: table is not enough")
+            throw ReservationException("Internal error: table is not enough. Remaining table is ${restaurant.numberOfTable}")
         }
     }
 
