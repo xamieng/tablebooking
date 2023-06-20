@@ -1,7 +1,6 @@
 package com.reservation.assembler
 
 import com.reservation.domain.Restaurant
-import com.reservation.request.RestaurantRequestDTO
 import com.reservation.response.RestaurantResponseDTO
 import org.springframework.stereotype.Component
 

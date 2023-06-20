@@ -8,11 +8,12 @@ class Restaurant {
     var key: RestaurantKey? = null
     var initialized: Boolean? = false
     var numberOfTable: Int? = 0
-    @Version var version: Long = 0 // Optimistic locking
+    @Version var version: Long = 0 // Optimistic locking to avoid stale data.
 
     override fun toString() = "Restaurant = { key = $key, isInitialized = $initialized, numberOfTable: $numberOfTable }"
 }
 
+// Composite key on date and restaurant - this will allow us to keep reservation history.
 class RestaurantKey {
     var date: String? = null
     var restaurantName: String? = null

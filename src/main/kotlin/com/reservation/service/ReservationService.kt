@@ -34,7 +34,9 @@ class ReservationService(
         logger.debug("createReservation: dto:$dto, remainingTable:$remainingTable")
         if (restaurant.initialized != true) throw ReservationException("Restaurant ${restaurant.key} haven't been initialize yet.")
 
+        // TODO the number 4.0 should be configurable
         val desireTable = ceil(dto.numberOfGuest / 4.0).toInt()
+        // We are not allow to reserve table if remaining table is not enough
         if ((remainingTable ?: 0) >= desireTable) {
             val reservation = Reservation()
             reservation.restaurantName = dto.restaurantName
@@ -52,6 +54,7 @@ class ReservationService(
     @CacheEvict(cacheNames = ["reservation"], key = "#reservation.reservationId")
     fun cancelReservation(reservation: Reservation): Reservation {
         logger.debug("cancelReservation: $reservation")
+        // Throw exception if the reservation was already cancelled
         if (reservation.active) {
             reservation.active = false
             return reservationRepository.save(reservation)

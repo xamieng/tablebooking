@@ -60,7 +60,7 @@ class RestaurantService(
         key.restaurantName = dto.restaurantName
         key.date = dto.date
         restaurant.key = key
-        restaurant.initialized = dto.initialized
+        restaurant.initialized = true
         restaurant.numberOfTable = dto.numberOfTable
         return restaurantRepository.save(restaurant)
     }

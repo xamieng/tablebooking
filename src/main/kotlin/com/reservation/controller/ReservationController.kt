@@ -37,6 +37,7 @@ class ReservationController(
     ): ResponseEntity<ReservationResponseDTO> {
         logger.info("cancel: restaurant: $restaurantName, date: $date, id: $id")
         val reservation = reservationService.getReservationById(id)
+        // validate restaurant in cancel request and reservation. Reject if they are not the same.
         if (restaurantName != reservation.restaurantName) throw ReservationException("Booking $id is not belong to $restaurantName")
         val restaurant = restaurantService.getRestaurantByKey(reservation.restaurantName, date)
         val cancelledReservation = reservationService.cancelReservation(reservation)

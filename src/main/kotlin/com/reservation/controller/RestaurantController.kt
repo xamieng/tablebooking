@@ -25,6 +25,7 @@ class RestaurantController(
         return ResponseEntity.ok(restaurantAssembler.assembleDTO(updatedRestaurant))
     }
 
+    // To Support multiple restaurant
     @GetMapping("/{name}/{date}")
     fun getRestaurant(@PathVariable name: String, @PathVariable date: String): ResponseEntity<RestaurantResponseDTO> {
         logger.info("getRestaurant: name: $name, date: $date")
