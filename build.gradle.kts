@@ -19,6 +19,7 @@ repositories {
 }
 
 dependencies {
+	implementation("org.springdoc:springdoc-openapi-ui:1.6.15")
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.springframework.boot:spring-boot-starter-web")
