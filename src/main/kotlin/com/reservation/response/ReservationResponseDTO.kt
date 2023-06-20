@@ -8,6 +8,4 @@ class ReservationResponseDTO {
     var numberOfTable: Int? = 0
     var active: Boolean = false
     var remainingTable: Int? = 0
-    override fun toString() =
-        "ReservationResponseDTO = { reservationId: $reservationId, restaurantName: $restaurantName, date: $date, numberOfGuest: $numberOfGuest, numberOfTable: $numberOfTable, active: $active, remainingTable:$remainingTable }"
 }

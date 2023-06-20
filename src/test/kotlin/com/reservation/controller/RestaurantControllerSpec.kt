@@ -1,21 +1,20 @@
 package com.reservation.controller
 
 import com.reservation.assembler.RestaurantAssembler
-import com.reservation.domain.Restaurant
-import com.reservation.domain.RestaurantKey
 import com.reservation.exception.BadRequestException
 import com.reservation.exception.NotFoundException
-import com.reservation.request.RestaurantRequestDTO
+import com.reservation.helper.TestHelper
+import com.reservation.helper.TestHelper.any
 import com.reservation.service.RestaurantService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.`when`
 import org.junit.runner.RunWith
+import org.mockito.BDDMockito.given
 import org.mockito.Mock
+import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
 import org.springframework.http.HttpStatus
-import org.mockito.BDDMockito.given
 
 @RunWith(MockitoJUnitRunner::class)
 class RestaurantControllerSpec {
@@ -31,76 +30,50 @@ class RestaurantControllerSpec {
     }
 
     @Test
-    fun testInitialize_when_success() {
-        `when`(restaurantService.initialize(any())).thenReturn(getMockRestaurant())
+    fun test_initialize_when_success() {
+        `when`(restaurantService.initialize(any())).thenReturn(TestHelper.getMockRestaurant())
 
-        val actual = restaurantController.initialize(getMockRestaurantRequestDTO())
+        val actual = restaurantController.initialize(TestHelper.getMockRestaurantRequestDTO())
         val actualBody = actual.body
 
         assertThat(actual.statusCode).isEqualTo(HttpStatus.OK)
         actualBody?.let {
-            assertThat(it.restaurantName).isEqualTo("Mock name")
-            assertThat(it.date).isEqualTo("Mock date")
+            assertThat(it.restaurantName).isEqualTo("mock name")
+            assertThat(it.date).isEqualTo("mock date")
             assertThat(it.initialized).isEqualTo(true)
             assertThat(it.numberOfTable).isEqualTo(5)
         }
     }
 
     @Test(expected = BadRequestException::class)
-    fun testInitialize_when_table_already_initialize() {
+    fun test_initialize_when_table_already_initialize() {
         given(restaurantService.initialize(any())).willAnswer {
-            throw BadRequestException("Mock exception")
+            throw BadRequestException("mock exception")
         }
-        restaurantController.initialize(getMockRestaurantRequestDTO())
+        restaurantController.initialize(TestHelper.getMockRestaurantRequestDTO())
     }
 
     @Test
-    fun testGetRestaurant_when_success() {
-        `when`(restaurantService.getRestaurantByKey(any(), any())).thenReturn(getMockRestaurant())
+    fun test_getRestaurant_when_success() {
+        `when`(restaurantService.getRestaurantByKey(any(), any())).thenReturn(TestHelper.getMockRestaurant())
 
         val actual = restaurantController.getRestaurant("mock name", "mock date")
         val actualBody = actual.body
 
         assertThat(actual.statusCode).isEqualTo(HttpStatus.OK)
         actualBody?.let {
-            assertThat(it.restaurantName).isEqualTo("Mock name")
-            assertThat(it.date).isEqualTo("Mock date")
+            assertThat(it.restaurantName).isEqualTo("mock name")
+            assertThat(it.date).isEqualTo("mock date")
             assertThat(it.initialized).isEqualTo(true)
             assertThat(it.numberOfTable).isEqualTo(5)
         }
     }
 
     @Test(expected = NotFoundException::class)
-    fun testGetRestaurant_when_not_found() {
+    fun test_getRestaurant_when_not_found() {
         given(restaurantService.getRestaurantByKey(any(), any())).willAnswer {
-            throw NotFoundException("Mock exception")
+            throw NotFoundException("mock exception")
         }
         restaurantController.getRestaurant("mock name", "mock date")
-    }
-
-    private fun getMockRestaurant(): Restaurant {
-        val restaurant = Restaurant()
-        val key = RestaurantKey()
-        key.restaurantName = "Mock name"
-        key.date = "Mock date"
-
-        restaurant.key = key
-        restaurant.initialized = true
-        restaurant.numberOfTable = 5
-
-        return restaurant
-    }
-
-    private fun getMockRestaurantRequestDTO(): RestaurantRequestDTO {
-        val dto = RestaurantRequestDTO()
-        dto.restaurantName = "Mock name"
-        dto.date = "Mock date"
-        dto.initialized = true
-        dto.numberOfTable = 5
-        return dto
-    }
-
-    private fun <T> any(): T {
-        return org.mockito.ArgumentMatchers.any()
     }
 }
